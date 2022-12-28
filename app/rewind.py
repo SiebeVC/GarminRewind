@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def make_rewind(df, name):
-    with open("files/index.html", 'r') as temp:
+    with open("../files/index.html", 'r') as temp:
         template = temp.read()
 
     session_count = len(df)

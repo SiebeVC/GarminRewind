@@ -15,7 +15,7 @@ app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
-    with open("files/form.html", 'r') as form:
+    with open("../files/form.html", 'r') as form:
         form_d = form.read()
     return form_d
 
@@ -29,3 +29,8 @@ def rewind(name, file: UploadFile = File(...)):
 
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+import uvicorn
+
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", port=8000)
