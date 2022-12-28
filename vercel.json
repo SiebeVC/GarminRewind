@@ -1,4 +1,9 @@
 {
+  "build": {
+    "env": {
+      "PIP_OPTIONS": "--no-deps --only-binary :all:"
+    }
+  },
   "builds": [
     {"src": "/app/main.py", "use": "@vercel/python"}
   ],
