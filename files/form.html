@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Your Rewind!</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+    body {
+        font-family: 'Roboto Mono', monospace;
+    }
+
+    main {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    input[type="text"] {
+        height: 30px;
+        border-radius: 7px;
+        border: 1px solid #000;
+        margin: 10px;
+    }
+
+    button{
+        height: 30px;
+        width: 150px;
+        border-radius: 7px;
+        border: none;
+        margin: 10px;
+        background-color: #a4e897;
+    }
+</style>
+
+<body>
+    <main>
+        <h1>Get Your Garmin Rewind</h1>
+        <form>
+            <div>
+            <label for="name">Name</label>
+            <input name="name" id="name" required type="text"/>
+        </div>
+        <div>
+            <label for="file">File</label>
+            <input name="file" id="file" required type="file" />
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+        </form>
+    </main>
+</body>
+<script>
+    onload = () => {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file', document.querySelector('#file').files[0]);
+
+            const name = document.querySelector('#name').value;
+            const file = document.querySelector('#file').value;
+            const data = await fetch(`${window.location.protocol}//${window.location.host}/rewind?name=${name}`, {
+                method: 'POST',
+                body: formData
+            }).then(res => res.blob())
+            .then(
+                blob => {
+                    const f = window.URL.createObjectURL(blob);
+
+                    a = document.createElement('a');
+                    a.style = "display: none";
+                    a.href = f
+                    a.download = `rewind_${name}.html`;
+                    a.click();
+                    window.URL.revokeObjectURL(f);
+                }
+            )
+
+        })
+    }
+</script>
+</html>
