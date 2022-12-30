@@ -14,6 +14,13 @@ from app.rewind import make_rewind
 
 app = FastAPI()
 
+def try_parse_date(date_str):
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
@@ -31,7 +38,7 @@ def rewind(name, file: UploadFile = File(...)):
 
     # Iterate over the rows of the file
     for row in reader:
-        if datetime.strptime(row["Date"], "%Y-%m-%d %H:%M:%S").year != 2022:
+        if try_parse_date(row["Date"]).year != 2022:
             continue
         # Iterate over the keys and values in the row
         for key, value in row.items():

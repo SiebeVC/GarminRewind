@@ -1,10 +1,20 @@
 from datetime import datetime, timedelta
 from collections import Counter
 
+def try_parse_date(date_str):
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
+
 def reformat(s):
     s = s.replace('.', '')
+    s = s.replace(',', '')
     s = s.replace("--", '0')
     return int(s)
+
 
 def make_rewind(df, name):
     with open("files/index.html", 'r') as temp:
@@ -16,7 +26,7 @@ def make_rewind(df, name):
     # Total Days
     days = set()
     for i in range(session_count):
-        d = datetime.strptime(df[(i, "Date")], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+        d = try_parse_date(df[(i, "Date")]).strftime("%Y-%m-%d")
         days.add(d)
     template = template.replace("=DAYS=", str(len(days)))
 
