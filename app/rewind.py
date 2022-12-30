@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from collections import defaultdict, Counter
+from collections import Counter
 
 
 def make_rewind(df, name):

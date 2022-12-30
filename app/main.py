@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import csv
 import pandas_lite as pd
-from starlette.responses import FileResponse, Response
+from starlette.responses import Response
+from datetime import datetime
 
 from app.rewind import make_rewind
 
@@ -30,6 +31,8 @@ def rewind(name, file: UploadFile = File(...)):
 
     # Iterate over the rows of the file
     for row in reader:
+        if datetime.strptime(row["Date"], "%Y-%m-%d %H:%M:%S").year != 2022:
+            continue
         # Iterate over the keys and values in the row
         for key, value in row.items():
             # Initialize the array for the key if it doesn't exist

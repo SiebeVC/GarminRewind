@@ -132,7 +132,7 @@
             const file = document.querySelector('#file').value;
 
 
-            const data = await fetch(`http://localhost:8000/rewind?name=${name}`, {
+            const data = await fetch(`${window.location.protocol}://${window.location.hostname}/rewind?name=${name}`, {
                     method: 'POST',
                     body: formData
                 }).then(res => res.blob())
