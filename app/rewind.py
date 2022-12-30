@@ -1,58 +1,73 @@
-import pandas as pd
+from datetime import datetime, timedelta
+from collections import defaultdict, Counter
 
 
 def make_rewind(df, name):
-    with open("../files/index.html", 'r') as temp:
+    with open("files/index.html", 'r') as temp:
         template = temp.read()
 
     session_count = len(df)
     template = template.replace("=SESSIONS=", str(session_count))
 
-    df['Date'] = pd.to_datetime(df['Date'])
-    df['ShortDate'] = df['Date'].dt.strftime('%Y-%m-%d')
-    day_count = len(df['ShortDate'].unique())
-    template = template.replace("=DAYS=", str(day_count))
+    # Total Days
+    days = set()
+    for i in range(session_count):
+        d = datetime.strptime(df[(i, "Date")], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+        days.add(d)
+    template = template.replace("=DAYS=", str(len(days)))
 
-    df['Time'] = pd.to_timedelta(df['Time'])
-    total_time = df['Time'].sum()
+    # Total Time
+    time = []
+    for i in range(session_count):
+        d = datetime.strptime(df[(i, "Time")], "%H:%M:%S")
+        delta = timedelta(hours=d.hour, minutes=d.minute, seconds=d.second)
+        time.append(delta)
+
+    total_time = sum(time, timedelta())
     seconds = total_time.total_seconds()
     days, rem = divmod(seconds, 86400)
     hours, rem = divmod(rem, 3600)
     minutes, seconds = divmod(rem, 60)
+
     template = template.replace("=TIME=", f"{int(days)}d {int(hours)}h {int(minutes)}m")
 
-    calories = round(df['Calories'].sum())
+    # Total Calories
+    calories = sum([int(df[(i, "Calories")]) for i in range(session_count)])
     template = template.replace("=CALORIES=", str(calories))
 
-    average_heart_rate = round(df['Avg HR'].mean())
-    template = template.replace("=AVGHEART=", str(average_heart_rate))
+    avg_heart = sum([int(df[(i, "Avg HR")]) for i in range(session_count)])
+    template = template.replace("=AVGHEART=", str(round(avg_heart / session_count)))
 
-    max_heart_rate = round(df['Max HR'].max())
-    template = template.replace("=MAXHEART=", str(max_heart_rate))
+    # Max Heart
+    max_heart = max([int(df[(i, "Max HR")]) for i in range(session_count)])
+    template = template.replace("=MAXHEART=", str(max_heart))
 
+    # Max Height
     def reformat_height(s):
         s = s.replace('.', '')
         s = s.replace("--", '0')
-        return float(s)
+        return int(s)
 
-    df["Max Height"] = df["Max Elevation"].apply(reformat_height).astype(float)
-    highest_point = round(df['Max Height'].max())
-    template = template.replace("=MAXHEIGHT=", str(highest_point))
+    max_height = max([reformat_height(df[(i, "Max Elevation")]) for i in range(session_count)])
+    template = template.replace("=MAXHEIGHT=", str(max_height))
 
-    total_height = round(df['Total Ascent'].apply(reformat_height).astype(float).sum())
+    # Total Height
+    total_height = sum([reformat_height(df[(i, "Total Ascent")]) for i in range(session_count)])
     template = template.replace("=TOTALHEIGHT=", str(total_height))
 
-    activity_types = {**df['Activity Type'].value_counts()}
-    i = 1
-    for k, v in activity_types.items():
-        if i > 4:
-            break
-        template = template.replace(f"=ACT{i}=", str(k) + " - " + str(v))
-        i += 1
+    activities = []
+    for i in range(session_count):
+        activities.append(df[(i, "Activity Type")])
+    counted = Counter(activities)
 
-    while i <= 4:
-        template = template.replace(f"=ACT{i}=", "")
-        i += 1
+    c = 0
+    for k, v in counted.items():
+        c += 1
+        template = template.replace(f"=ACT{c}=", f"{k} ({v})")
+
+    while c < 5:
+        c += 1
+        template = template.replace(f"=ACT{c}=", "")
 
     template = template.replace("=NAME=", name)
 
