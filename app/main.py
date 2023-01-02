@@ -4,23 +4,14 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-
 import csv
 import pandas_lite as pd
 from starlette.responses import Response
-from datetime import datetime
 
 from app.rewind import make_rewind
+from app.utils import try_parse_date
 
 app = FastAPI()
-
-def try_parse_date(date_str):
-    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
-        try:
-            return datetime.strptime(date_str, fmt)
-        except ValueError:
-            pass
-    raise ValueError('no valid date format found')
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():

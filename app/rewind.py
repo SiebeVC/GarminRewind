@@ -1,19 +1,6 @@
 from datetime import datetime, timedelta
 from collections import Counter
-
-def try_parse_date(date_str):
-    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
-        try:
-            return datetime.strptime(date_str, fmt)
-        except ValueError:
-            pass
-    raise ValueError('no valid date format found')
-
-def reformat(s):
-    s = s.replace('.', '')
-    s = s.replace(',', '')
-    s = s.replace("--", '0')
-    return int(s)
+from app.utils import try_parse_date, reformat
 
 
 def make_rewind(df, name):
