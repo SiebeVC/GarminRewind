@@ -13,8 +13,11 @@ def make_rewind(df, name):
     # Total Days
     days = set()
     for i in range(session_count):
-        d = try_parse_date(df[(i, "Date")]).strftime("%Y-%m-%d")
-        days.add(d)
+        try:
+            d = try_parse_date(df[(i, "Date")]).strftime("%Y-%m-%d")
+            days.add(d)
+        except Exception as e:
+            print(e)
     template = template.replace("=DAYS=", str(len(days)))
 
     # Total Time

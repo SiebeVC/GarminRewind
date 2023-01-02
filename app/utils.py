@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 def try_parse_date(date_str):
     for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M'):
