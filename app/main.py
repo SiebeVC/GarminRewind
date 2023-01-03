@@ -29,7 +29,7 @@ def rewind(name, file: UploadFile = File(...)):
 
     # Iterate over the rows of the file
     for row in reader:
-        if try_parse_date(row["Date"]).year != 2022:
+        if not row["Date"] or try_parse_date(row["Date"]).year != 2022:
             continue
         # Iterate over the keys and values in the row
         for key, value in row.items():
